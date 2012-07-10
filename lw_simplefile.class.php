@@ -10,6 +10,7 @@ class lw_simplefile extends lw_plugin
     function buildPageOutput()
     {
         include_once(dirname(__FILE__).'/classes/sf_base.php');
+        
         if ($this->params['cmd']=="upload") {
             include_once(dirname(__FILE__).'/classes/sf_upload.php');
             $object = new sf_upload();
@@ -22,6 +23,7 @@ class lw_simplefile extends lw_plugin
         else {
             return "<!-- cmd missing -->";
         }
+        
         $object->setID($this->params['id']);
         $object->setIntranet($this->params['intranet']);
         $object->execute();

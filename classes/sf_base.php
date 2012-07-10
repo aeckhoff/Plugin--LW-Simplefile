@@ -21,4 +21,22 @@ class sf_base extends lw_object
     {
         return $this->output;
     }
+    
+    function fileExists()
+    {
+        $directory = lw_directory::getInstance($this->config['lw_simplefile']['dir'].$this->id.'/');
+        $files = $directory->getDirectoryContents('file');
+        
+        if (count($files)==1) {
+            return true;
+        }
+        return false;
+    }
+    
+    function getFile()
+    {
+        $directory = lw_directory::getInstance($this->config['lw_simplefile']['dir'].$this->id.'/');
+        $files = $directory->getDirectoryContents('file');
+        return $files[0];
+    }    
 }
