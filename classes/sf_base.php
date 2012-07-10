@@ -24,6 +24,9 @@ class sf_base extends lw_object
     
     function fileExists()
     {
+        if (!is_dir($this->config['lw_simplefile']['dir'].$this->id.'/')) {
+            return false;
+        }
         $directory = lw_directory::getInstance($this->config['lw_simplefile']['dir'].$this->id.'/');
         $files = $directory->getDirectoryContents('file');
         
@@ -38,5 +41,35 @@ class sf_base extends lw_object
         $directory = lw_directory::getInstance($this->config['lw_simplefile']['dir'].$this->id.'/');
         $files = $directory->getDirectoryContents('file');
         return $files[0];
+    }
+    
+    function getMaxUploadSize()
+    {
+        $maxpost = ini_get('post_max_size');
+        $maxfile = ini_get('upload_max_filesize');
+        if ($maxpost > $maxfile) {
+            $maxsize = $maxfile;
+        }
+        else {
+            $maxsize = $maxpost;
+        }
+        return $maxsize;
+    }
+    
+    function return_bytes($val) 
+    {
+        $val = trim($val);
+        $last = strtolower($val[strlen($val)-1]);
+        switch($last) {
+            // The 'G' modifier is available since PHP 5.1.0
+            case 'g':
+                $val *= 1024;
+            case 'm':
+                $val *= 1024;
+            case 'k':
+                $val *= 1024;
+        }
+
+        return $val;
     }    
 }

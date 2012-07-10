@@ -23,6 +23,7 @@ class sf_upload extends sf_base
                 break;
                 
             case "done":
+                $this->pageReload(lw_page::getInstance()->getUrl());
                 $this->output = $this->showDoneMessage();
                 break;
             
@@ -47,17 +48,14 @@ class sf_upload extends sf_base
     {
         $fileArray = $this->request->getFileData('file');
         
-        if (strlen(trim($fileArray['name'])) < 1) {
+        if (strlen(trim($fileArray['name'])) < 1 || $fileArray['size'] < 1) {
             $error = true;
-            $this->errorMessage[] = "nofilename";
+            $this->errorMessage[] = "nofile";
         }
         
-        if ($fileArray['size'] < 1) {
-            $error = true;
-            $this->errorMessage[] = "filenosize";
-        }
+        $maxsize = $this->return_bytes($this->getMaxUploadSize());
         
-        if ($fileArray['size'] > 100000) {
+        if ($fileArray['size'] >  $maxsize) {
             $error = true;
             $this->errorMessage[] = "filetoobig";
         }
@@ -80,7 +78,9 @@ class sf_upload extends sf_base
     {
         if ($this->config['lw_simplefile']['dir'] && is_dir($this->config['lw_simplefile']['dir']) && is_writable($this->config['lw_simplefile']['dir'])) {
             $directory = lw_directory::getInstance($this->config['lw_simplefile']['dir'].$this->id.'/');
-            $directory->delete(true);
+            if (is_dir($this->config['lw_simplefile']['dir'].$this->id.'/')) {
+                $directory->delete(true);
+            }
             mkdir($directory->getBasepath().$directory->getName());
             $directory->addFile($this->tempname, $this->filename);
             return true;
@@ -113,9 +113,9 @@ class sf_upload extends sf_base
         }
         
         if (count($this->errorMessage)>0) {
-            foreach($this->errorMessage as $message) {
-                $output.="<div>".$message."</div>".PHP_EOL;
-            }
+            $output.='<div style="padding:5px; border:2px solid red;">';
+            $output.="<div>Please select a file to upload. It should not be greater than ".$this->getMaxUploadSize()."B!</div>".PHP_EOL;
+            $output.='</div>';
         }
         
         return $output;

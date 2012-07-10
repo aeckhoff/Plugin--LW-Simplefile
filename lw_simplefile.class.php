@@ -4,11 +4,15 @@ class lw_simplefile extends lw_plugin
 {
     function __construct()
     {
-
+        parent::__construct();
     }
     
     function buildPageOutput()
     {
+        if (!lw_in_auth::getInstance()->isLoggedIn() && !lw_registry::getInstance()->getEntry("auth")->isLoggedIn()) {
+            return "<!-- simplefile needs a logged in user -->";
+        }
+        
         include_once(dirname(__FILE__).'/classes/sf_base.php');
         
         if ($this->params['cmd']=="upload") {
